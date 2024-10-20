@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bsky-rss
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: bsky-rss
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: bsky-rss
+    spec:
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: bsky-rss
+      containers:
+      - name: main
+        image: ghcr.io/milanmdev/bsky.rss
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        envFrom:
+          - secretRef:
+              name: bsky-rss
+        volumeMounts:
+          - name: config
+            mountPath: /build/data
+        #command: ["sleep", "inf"]
